@@ -21,6 +21,7 @@ class User:
         self.id = id
         self.date = datetime.datetime.now() - datetime.timedelta(weeks=randint(5, 25))
         self.incr_date()
+        self.paths = []
 
     def incr_date(self, weak=False):
         if weak:
@@ -28,5 +29,8 @@ class User:
                         datetime.timedelta(minutes=randint(0, 30), seconds=randint(0, 60))
         else:
             self.date = self.date + \
-                        datetime.timedelta(days=randint(0, 30), minutes=randint(0, 1200), seconds=randint(0, 60))
+                        datetime.timedelta(days=randint(1, 30), minutes=randint(0, 1200), seconds=randint(0, 60))
+
+    def add_info(self, info):
+        self.paths.append(info)
 

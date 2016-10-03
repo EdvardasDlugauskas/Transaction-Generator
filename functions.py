@@ -7,7 +7,8 @@ def isLucky(chance_percent=50):
     return False
 
 
-def create_transaction(client, user, trans_type=1, is_lead=False, url_from_override=None):
+def create_transaction(client, user, trans_type=1, is_lead=False, url_from_override=None, weak_date_incr = None):
+
     transaction = dict(
         LogTime=user.date.strftime("%Y-%m-%d %H:%M:%S"),
         TransactionType=trans_type,
@@ -40,13 +41,16 @@ def create_transaction(client, user, trans_type=1, is_lead=False, url_from_overr
     if url_from_override is not None:
         transaction["URLfrom"] = url_from_override
 
-    user.incr_date(weak=True if trans_type == 100 else False)
+    # Log it
+    user.add_info("Conversion: client {} at {}".format(client.name, user.date.strftime("%Y-%m-%d %H:%M:%S")))
 
-    return  transaction
+    user.incr_date(weak=weak_date_incr)
+
+    return transaction
 
 
 def create_logpoint_chain(client, user, url_from_override=None):
-    tlist = [create_transaction(client, user, trans_type=100, url_from_override=url_from_override)]
+    tlist = [create_transaction(client, user, trans_type=100, url_from_override=url_from_override, weak_date_incr=True)]
     while True:
         if isLucky(10):
             # Get lead
@@ -54,7 +58,7 @@ def create_logpoint_chain(client, user, url_from_override=None):
             break
         elif isLucky(80):
             # Another log
-            tlist.append(create_transaction(client, user, trans_type=100))
+            tlist.append(create_transaction(client, user, trans_type=100, weak_date_incr=True))
         else:
             break
     return tlist
